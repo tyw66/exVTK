@@ -1,0 +1,5 @@
+SET(projectName line)
+project(${projectName})
+aux_source_directory(.  SRC_LIST)
+add_executable(${projectName} ${SRC_LIST})
+target_link_libraries(${projectName} ${VTK_LIBRARIES})
