@@ -1,0 +1,13 @@
+project(3d)
+
+ADD_EXECUTABLE(basic basic.cpp)
+TARGET_LINK_LIBRARIES(basic ${VTK_LIBRARIES})
+
+ADD_EXECUTABLE(polydata polydata.cpp)
+TARGET_LINK_LIBRARIES(polydata ${VTK_LIBRARIES})
+
+ADD_EXECUTABLE(line line.cpp)
+TARGET_LINK_LIBRARIES(line ${VTK_LIBRARIES})
+
+ADD_EXECUTABLE(boundingbox boundingbox.cpp)
+TARGET_LINK_LIBRARIES(boundingbox ${VTK_LIBRARIES})

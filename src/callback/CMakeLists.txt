@@ -1,5 +1,0 @@
-SET(ex01 callback)
-project(${ex01})
-aux_source_directory(.  SRC_LIST)
-add_executable(${ex01} ${SRC_LIST})
-target_link_libraries(${ex01} ${VTK_LIBRARIES})

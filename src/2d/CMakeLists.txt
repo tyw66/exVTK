@@ -1,5 +1,4 @@
-SET(projectName image)
-project(${projectName})
+project(2d)
 
 ADD_EXECUTABLE(ImageView imgview.cpp)
 TARGET_LINK_LIBRARIES(ImageView ${VTK_LIBRARIES})

@@ -1,25 +1,10 @@
-/** ************************
- * 第3章 - 数据集
- *
- ***************************/
-/*
-// for vtk 8.1 use :
-//#include <vtkAutoInit.h>
-//VTK_MODULE_INIT(vtkInteractionStyle)
-//VTK_MODULE_INIT(vtkRenderingFreeType)
-//VTK_MODULE_INIT(vtkRenderingOpenGL2)
-*/
-
-
 #include "vtkSmartPointer.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkLine.h"
 
 #include "vtkPolyDataWriter.h"
-
 #include"vtkDataSet.h"
-
 #include "vtkImageData.h"
 
 #define NEW_VTK(type, name) vtkSmartPointer<type> name =  vtkSmartPointer<type>::New()

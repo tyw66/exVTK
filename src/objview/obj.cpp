@@ -23,6 +23,7 @@
 #include "vtkInteractorStyleTrackballCamera.h"
 
 #include <vtkOBJReader.h>
+#include<vtkImageActor.h>
 
 
 #include "vtkImageViewer2.h"
@@ -33,7 +34,7 @@ int main()
 {
     //OBJ模型数据源
     NEW_VTK(vtkOBJReader, objReader);
-    objReader->SetFileName("./res/lego.obj");
+    objReader->SetFileName("../data/lego.obj");
     objReader->Update();//可以省略
 
 
@@ -45,7 +46,7 @@ int main()
 
     //读贴图
     NEW_VTK(vtkBMPReader,imgReader);
-    imgReader->SetFileName("./lego.bmp");
+    imgReader->SetFileName("../data/lego.bmp");
 
 
     NEW_VTK(vtkTexture,objTexture);
@@ -53,68 +54,75 @@ int main()
 
     //  objTexture->Print(std::cout);
 
-    //几何数据实体
+    //模型演员
     NEW_VTK(vtkActor, objActor);
     objActor->SetMapper(objMapper);
     objActor->SetTexture(objTexture);
     objActor->GetProperty()->SetColor(1,1,1);
 
+    //贴图演员
+    NEW_VTK(vtkImageActor, imgActor);
+//    imgActor->SetInput(imgReader->GetOutput());
 
-    //渲染器
-    vtkSmartPointer<vtkRenderer>renderer=vtkSmartPointer<vtkRenderer>::New();
-    renderer->AddActor(objActor);
-    renderer->SetBackground(0.5,0.5,0.5);
-    renderer->ResetCamera();
-    //  renderer->GetActiveCamera()->Zoom(1.5);
+    //模型的渲染器（左）
+    NEW_VTK(vtkRenderer, rendererModel);
+    rendererModel->SetBackground(0.5,0.5,0.5);
+    rendererModel->ResetCamera();
+    rendererModel->SetViewport(0,1,0,0.5);
+    rendererModel->AddActor(objActor);
+
+    //贴图的渲染器（右）
+    NEW_VTK(vtkRenderer, rendererImg);
+    rendererImg->SetBackground(0.5,0.5,0.5);
+    rendererImg->ResetCamera();
+    rendererImg->SetViewport(0,1,0.5,1.0);
+    rendererImg->AddActor(imgActor);
+
 
     //渲染窗口
-    vtkSmartPointer<vtkRenderWindow>renderWindow=vtkSmartPointer<vtkRenderWindow>::New();
-    renderWindow->SetSize(256,256);
-    renderWindow->AddRenderer(renderer);
+    NEW_VTK(vtkRenderWindow, renderWindow);
+    renderWindow->SetSize(512, 512);
+    renderWindow->AddRenderer(rendererImg);
+    renderWindow->AddRenderer(rendererModel);
 
     //交互器
-    vtkSmartPointer<vtkRenderWindowInteractor>interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    interactor->SetRenderWindow(renderWindow);
-
+    NEW_VTK(vtkRenderWindowInteractor, interactor);
     NEW_VTK(vtkInteractorStyleTrackballCamera, style);
-
+    interactor->SetRenderWindow(renderWindow);
     interactor->SetInteractorStyle(style);
-
     interactor->Initialize();
 
-    //光源
-    vtkSmartPointer<vtkLight>myLight_green = vtkSmartPointer<vtkLight>::New();
-    myLight_green->SetColor(0,1,0);
-    myLight_green->SetPosition(0,0,1);
-    myLight_green->SetFocalPoint(renderer->GetActiveCamera()->GetFocalPoint());
-    renderer->AddLight(myLight_green);
-    myLight_green->SwitchOff();  //关灯
+//    //光源
+//    vtkSmartPointer<vtkLight>myLight_green = vtkSmartPointer<vtkLight>::New();
+//    myLight_green->SetColor(0,1,0);
+//    myLight_green->SetPosition(0,0,1);
+//    myLight_green->SetFocalPoint(rendererModel->GetActiveCamera()->GetFocalPoint());
+//    rendererModel->AddLight(myLight_green);
+//    myLight_green->SwitchOff();  //关灯
 
-    vtkSmartPointer<vtkLight>myLight_blue = vtkSmartPointer<vtkLight>::New();
-    myLight_blue->SetColor(0,0,1);
-    myLight_blue->SetPosition(0,0,-1);
-    myLight_blue->SetFocalPoint(renderer->GetActiveCamera()->GetFocalPoint());
-    renderer->AddLight(myLight_blue);
-    myLight_blue->SwitchOff();
+//    vtkSmartPointer<vtkLight>myLight_blue = vtkSmartPointer<vtkLight>::New();
+//    myLight_blue->SetColor(0,0,1);
+//    myLight_blue->SetPosition(0,0,-1);
+//    myLight_blue->SetFocalPoint(rendererModel->GetActiveCamera()->GetFocalPoint());
+//    rendererModel->AddLight(myLight_blue);
+//    myLight_blue->SwitchOff();
 
     //相机
-    vtkSmartPointer<vtkCamera> myCamera = vtkSmartPointer<vtkCamera>::New();
-    myCamera->SetClippingRange(0.5,10);
+//    vtkSmartPointer<vtkCamera> myCamera = vtkSmartPointer<vtkCamera>::New();
+//    myCamera->SetClippingRange(0.5,10);
     //  myCamera->SetFocalPoint(.....);//to be countinued
 
 
-    //    //贴图查看
-    //    NEW_VTK(vtkImageViewer2,imgViewer);
-    //    NEW_VTK(vtkRenderWindowInteractor,textureInteractor);
-    //    imgViewer->SetInputConnection(imgReader->GetOutputPort());
-    //    imgViewer->SetupInteractor(textureInteractor);
-    //    imgViewer->Render();
-
+//    //贴图查看
+    NEW_VTK(vtkImageViewer2,imgViewer);
+    imgViewer->SetInputConnection(imgReader->GetOutputPort());
+    NEW_VTK(vtkRenderWindowInteractor,textureInteractor);
+    imgViewer->SetupInteractor(textureInteractor);
+    imgViewer->Render();
 
 
 
     interactor->Start();
-
     return EXIT_SUCCESS;
 
 

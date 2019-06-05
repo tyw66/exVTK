@@ -1,5 +1,4 @@
-SET(projectName objview)
-project(${projectName})
-aux_source_directory(.  SRC_LIST)
-add_executable(${projectName} ${SRC_LIST})
-target_link_libraries(${projectName} ${VTK_LIBRARIES})
+PROJECT(obj)
+
+ADD_EXECUTABLE(obj obj.cpp)
+TARGET_LINK_LIBRARIES(obj ${VTK_LIBRARIES})
