@@ -13,8 +13,15 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkRenderWindow.h>
+#include <vtkPolyDataWriter.h>
+
+#include <vtkPolyDataNormals.h>
+#include <vtkArrowSource.h>
+#include <vtkGlyph3D.h>
+#include <vtkProperty.h>
 
 #define NEW_VTK(type, name) vtkSmartPointer<type> name =  vtkSmartPointer<type>::New()
+
 
 int main(){
     //定义点集合
@@ -44,24 +51,55 @@ int main(){
     cells->InsertNextCell(polygon);
     cells->InsertNextCell(triangle);
 
-    //定义polydata
-    NEW_VTK(vtkPolyData, polygonPolyfata);
-    polygonPolyfata->SetPoints(points);
-    polygonPolyfata->SetPolys(cells);
+    //定义polydata，把点集合与单元（拓扑）集合相联系。
+    NEW_VTK(vtkPolyData, polygonPolydata);
+    polygonPolydata->SetPoints(points);
+    polygonPolydata->SetPolys(cells);
+
+    //导出到VTK文件
+    NEW_VTK(vtkPolyDataWriter, polydatawriter);
+    polydatawriter->SetFileName("./model.vtk");
+    polydatawriter->SetInput(polygonPolydata);
+    polydatawriter->Write();
+
+    //计算法向量并显示
+    NEW_VTK(vtkPolyDataNormals, normalFilter);
+    normalFilter->SetInput(polygonPolydata);
+//    normalFilter->SetComputePointNormals(0);
+//    normalFilter->SetComputeCellNormals(1);
+    normalFilter->Update();
+
+    NEW_VTK(vtkArrowSource, arrow);
+    NEW_VTK(vtkGlyph3D, glyph);
+    glyph->SetInput(normalFilter->GetOutput());
+    glyph->SetSource(arrow->GetOutput());
+    glyph->SetVectorModeToUseNormal();
+    glyph->SetScaleFactor(0.2);
 
     //模型映射
     NEW_VTK(vtkPolyDataMapper, modelMapper);
-    modelMapper->SetInput(polygonPolyfata);
+    modelMapper->SetInput(polygonPolydata);
+
+    //法线模型映射
+    NEW_VTK(vtkPolyDataMapper, normalMapper);
+    normalMapper->SetInput(glyph->GetOutput());
+
+    //--可视化管线结束--
 
     //模型演员
     NEW_VTK(vtkActor, modelActor);
     modelActor->SetMapper(modelMapper);
+
+    NEW_VTK(vtkActor, nomallActor);
+    nomallActor->SetMapper(normalMapper);
+    nomallActor->GetProperty()->SetColor(0.2,0.8,0.9);
 
     //模型的渲染器
     NEW_VTK(vtkRenderer, rendererModel);
     rendererModel->SetBackground(0.5,0.5,0.5);
     rendererModel->ResetCamera();
     rendererModel->AddActor(modelActor);
+    rendererModel->AddActor(nomallActor);
 
     //渲染窗口
     NEW_VTK(vtkRenderWindow, renderWindow);
@@ -75,5 +113,8 @@ int main(){
     interactor->SetInteractorStyle(style);
     interactor->Initialize();
     interactor->Start();
+
+
+
 
 }
